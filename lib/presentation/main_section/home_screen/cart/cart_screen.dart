@@ -204,8 +204,12 @@ class CartScreen extends StatelessWidget {
                           physics: NeverScrollableScrollPhysics(),
                           itemCount: cartController.cartItems.length,
                           itemBuilder: (context, index) {
+                            final cartItem = cartController.cartItems[index];
+                            final productId = cartItem['id'];
+                            final currentQuantity = cartItem['quantity'];
                             final product =
                                 cartController.cartItems[index]['product'];
+
                             return Container(
                               padding: EdgeInsets.all(10),
                               decoration: BoxDecoration(
@@ -225,19 +229,51 @@ class CartScreen extends StatelessWidget {
                                         children: [
                                           Image.asset(
                                               'assets/images/cart1.png'),
-                                          sizedBoxHeight10,
+                                          const SizedBox(height: 10),
                                           Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceEvenly,
                                             children: [
-                                              Image.asset(
-                                                  'assets/images/cartdic.png'),
-                                              sizedBoxWidth20,
-                                              Text(
-                                                  '${cartController.cartItems[index]['quantity']}'),
-                                              sizedBoxWidth20,
-                                              Image.asset(
-                                                  'assets/images/cartincr.png'),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  if (cartController
+                                                          .currentQuantity
+                                                          .value >
+                                                      1) {
+                                                    // Decrement quantity
+                                                    cartController
+                                                        .updateCartQuantity(
+                                                            cartController
+                                                                    .currentQuantity
+                                                                    .value -
+                                                                1);
+                                                  }
+                                                },
+                                                child: Image.asset(
+                                                    'assets/images/cartdic.png'),
+                                              ),
+                                              const SizedBox(width: 20),
+                                              Obx(() => Text(
+                                                    '${cartController.currentQuantity.value}',
+                                                    style: TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  )),
+                                              const SizedBox(width: 20),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  // Increment quantity
+                                                  cartController
+                                                      .updateCartQuantity(
+                                                          cartController
+                                                                  .currentQuantity
+                                                                  .value +
+                                                              1);
+                                                },
+                                                child: Image.asset(
+                                                    'assets/images/cartincr.png'),
+                                              ),
                                             ],
                                           ),
                                         ],
@@ -342,6 +378,62 @@ class CartScreen extends StatelessWidget {
                                   ),
                                   Text(
                                       'Size: ${cartController.cartItems[index]['size']}'),
+                                  GestureDetector(
+                                    onTap: () async {
+                                      // Confirm deletion
+                                      bool confirm = await showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: Text('Confirm Deletion'),
+                                            content: Text(
+                                                'Are you sure you want to delete this item from the cart?'),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context)
+                                                      .pop(true);
+                                                },
+                                                child: Text('Yes'),
+                                              ),
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context)
+                                                      .pop(false);
+                                                },
+                                                child: Text('No'),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+
+                                      if (confirm) {
+                                        // Call delete API
+                                        final productId =
+                                            cartController.cartItems[index]
+                                                ['product']['productId'];
+                                        await cartController
+                                            .deleteCartProductById(productId);
+                                      }
+                                    },
+                                    child: Container(
+                                      height: Adaptive.h(5),
+                                      width: Adaptive.w(25),
+                                      decoration: BoxDecoration(
+                                          color: red,
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      child: Center(
+                                        child: Text(
+                                          'Remove',
+                                          style: GoogleFonts.poppins(
+                                              color: whiteColor,
+                                              fontSize: 12.px),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                   SizedBox(
                                     height: 50,
                                     child: Row(
@@ -359,6 +451,54 @@ class CartScreen extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 10),
+                      GestureDetector(
+                        onTap: () async {
+                          // Confirm deletion
+                          bool confirm = await showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Confirm Deletion'),
+                                content: Text(
+                                    'Are you sure you want to delete this item from the cart?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop(true);
+                                    },
+                                    child: Text('Yes'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop(false);
+                                    },
+                                    child: Text('No'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+
+                          if (confirm) {
+                            cartController.deleteCart();
+                          }
+                        },
+                        child: Container(
+                          height: Adaptive.h(5),
+                          width: Adaptive.w(25),
+                          decoration: BoxDecoration(
+                              color: const Color.fromARGB(255, 21, 59, 196),
+                              borderRadius: BorderRadius.circular(10)),
+                          child: Center(
+                            child: Text(
+                              'Remove Cart',
+                              style: GoogleFonts.poppins(
+                                  color: whiteColor, fontSize: 12.px),
+                            ),
+                          ),
+                        ),
+                      ),
+                      sizedBoxHeight10,
                       Container(
                         height: 50,
                         color: Color(0xffF2F2F2),

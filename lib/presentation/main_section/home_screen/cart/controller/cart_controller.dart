@@ -6,9 +6,14 @@ import 'dart:convert';
 
 class CartController extends GetxController {
   var isLoading = false.obs;
+  var cartItems = [].obs;
+  var addedProductIds = <String>[].obs;
+  var currentQuantity = 1.obs;
+  var currentProductId = ''.obs;
 
   Future<void> addToCart(String productId) async {
     isLoading(true);
+    currentProductId.value = productId;
     final token = Get.find<LoginController>().token.value;
 
     final url =
@@ -24,7 +29,7 @@ class CartController extends GetxController {
         body: jsonEncode({
           'productId': productId,
           'size': 'S',
-          'quantity': 1,
+          'quantity': currentQuantity.value,
         }),
       );
 
@@ -32,6 +37,7 @@ class CartController extends GetxController {
       print('Response Body: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+        addedProductIds.add(productId);
         Get.snackbar('Success', 'Item added to cart');
         Get.to(() => CartScreen());
       } else {
@@ -41,15 +47,12 @@ class CartController extends GetxController {
         print('Error: $errorMessage');
       }
     } catch (e) {
-      // Handle any exceptions that occur during the request
       Get.snackbar('Error', 'Failed to add item to cart: $e');
-      print('Exception: $e'); // Log the exception for debugging
+      print('Exception: $e');
     } finally {
       isLoading(false);
     }
   }
-
-  var cartItems = [].obs; // Observable list to store cart items
 
   Future<void> fetchCartItems() async {
     isLoading(true);
@@ -71,7 +74,6 @@ class CartController extends GetxController {
       print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        // Parse the response body and update cartItems
         var responseData = jsonDecode(response.body);
         cartItems.assignAll(responseData['data']['products']);
         Get.snackbar('Success', 'Cart retrieved successfully');
@@ -82,9 +84,91 @@ class CartController extends GetxController {
         print('Error: $errorMessage');
       }
     } catch (e) {
-      // Handle any exceptions that occur during the request
       Get.snackbar('Error', 'Failed to retrieve cart: $e');
       print('Exception: $e'); // Log the exception for debugging
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> deleteCartProductById(String productId) async {
+    isLoading(true);
+    final token = Get.find<LoginController>().token.value;
+
+    final url = Uri.parse(
+        'https://sanjay-tiwari-backend.vercel.app/api/user/cart/products/$productId');
+
+    try {
+      final response = await http.delete(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      print('Response Status: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        cartItems.removeWhere((item) => item['id'] == productId);
+        addedProductIds.remove(productId);
+        Get.snackbar('Success', 'Product removed from cart');
+      } else {
+        var errorData = jsonDecode(response.body);
+        String errorMessage = errorData['message'] ?? 'Unknown error';
+        Get.snackbar(
+            'Error', 'Failed to remove product from cart: $errorMessage');
+        print('Error: $errorMessage');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to remove product from cart: $e');
+      print('Exception: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> updateCartQuantity(int quantity) async {
+    isLoading(true);
+    final token = Get.find<LoginController>().token.value;
+
+    final url = Uri.parse(
+        'https://sanjay-tiwari-backend.vercel.app/api/user/cart/updateQuantity');
+
+    try {
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'productId': currentProductId.value,
+          'quantity': quantity,
+        }),
+      );
+
+      print('Response Status: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        final index = cartItems
+            .indexWhere((item) => item['id'] == currentProductId.value);
+        if (index != -1) {
+          cartItems[index]['quantity'] = quantity;
+          cartItems.refresh();
+        }
+        Get.snackbar('Success', 'Cart quantity updated');
+      } else {
+        var errorData = jsonDecode(response.body);
+        String errorMessage = errorData['message'] ?? 'Unknown error';
+        Get.snackbar('Error', 'Failed to update cart quantity: $errorMessage');
+        print('Error: $errorMessage');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to update cart quantity: $e');
+      print('Exception: $e');
     } finally {
       isLoading(false);
     }
@@ -93,6 +177,43 @@ class CartController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchCartItems(); // Fetch cart items when the controller is initialized
+    fetchCartItems();
+  }
+
+  Future<void> deleteCart() async {
+    isLoading(true);
+    final token = Get.find<LoginController>().token.value;
+
+    final url = Uri.parse(
+        'https://sanjay-tiwari-backend.vercel.app/api/user/cart/delete');
+
+    try {
+      final response = await http.delete(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      print('Response Status: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        cartItems.clear();
+        addedProductIds.clear();
+        Get.snackbar('Success', 'Cart deleted successfully');
+      } else {
+        var errorData = jsonDecode(response.body);
+        String errorMessage = errorData['message'] ?? 'Unknown error';
+        Get.snackbar('Error', 'Failed to delete cart: $errorMessage');
+        print('Error: $errorMessage');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to delete cart: $e');
+      print('Exception: $e');
+    } finally {
+      isLoading(false);
+    }
   }
 }
