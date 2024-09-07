@@ -34,16 +34,15 @@ class LoginController extends GetxController {
           token.value = data['token'];
           userId.value = data['data']['_id'];
 
-          // Show success message
           Get.snackbar('Login Success', 'Welcome back!',
               snackPosition: SnackPosition.BOTTOM);
 
-          // Navigate to HomeScreen (replace login screen)
           Get.offAll(() => BottomNavigation());
         } else {
           Get.snackbar('Error', data['message'],
               snackPosition: SnackPosition.BOTTOM);
         }
+        // print(token);
       } else {
         Get.snackbar('Error', 'Invalid credentials',
             snackPosition: SnackPosition.BOTTOM);

@@ -1,4 +1,5 @@
 import 'package:ecommerce_seller/presentation/main_section/home_screen/cart/cart_screen.dart';
+import 'package:ecommerce_seller/presentation/main_section/home_screen/cart/controller/cart_controller.dart';
 import 'package:ecommerce_seller/presentation/main_section/home_screen/top_products/product_screen/widgets/productdetails_widget.dart';
 import 'package:ecommerce_seller/presentation/main_section/home_screen/top_products/rating_and_review_screen/rating_And_review_screen.dart';
 import 'package:ecommerce_seller/utilz/colors.dart';
@@ -12,7 +13,9 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class ProductDetailsScreen extends StatelessWidget {
-  const ProductDetailsScreen({super.key});
+  final String productId;
+  ProductDetailsScreen({super.key, required this.productId});
+  final CartController cartController = Get.put(CartController());
 
   @override
   Widget build(BuildContext context) {
@@ -79,8 +82,8 @@ class ProductDetailsScreen extends StatelessWidget {
                     ),
                     sizedBoxHeight20,
                     Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 15.sp, vertical: 10.sp),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 15.sp, vertical: 10.sp),
                       decoration: BoxDecoration(
                           border: Border.all(
                             color: Colors.black45,
@@ -246,7 +249,8 @@ class ProductDetailsScreen extends StatelessWidget {
                         Spacer(),
                         Container(
                           padding: EdgeInsets.symmetric(
-                              horizontal: Adaptive.w(2), vertical: Adaptive.h(1)),
+                              horizontal: Adaptive.w(2),
+                              vertical: Adaptive.h(1)),
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12.sp),
                               border: Border.all(
@@ -270,7 +274,8 @@ class ProductDetailsScreen extends StatelessWidget {
                     sizedBoxHeight20,
                     containerFunctions('delivary2', '10 Days Return Policy'),
                     sizedBoxHeight20,
-                    containerFunctions('delivary3', 'Cash on Delivery Available'),
+                    containerFunctions(
+                        'delivary3', 'Cash on Delivery Available'),
                     sizedBoxHeight20,
                     Divider(
                       color: black,
@@ -399,7 +404,8 @@ class ProductDetailsScreen extends StatelessWidget {
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: 2, // Number of columns
-                                  crossAxisSpacing: 5, // Spacing between columns
+                                  crossAxisSpacing:
+                                      5, // Spacing between columns
                                   mainAxisSpacing: 9.0, // Spacing between rows
                                   childAspectRatio: 0.8),
                           itemCount: 2,
@@ -426,8 +432,7 @@ class ProductDetailsScreen extends StatelessWidget {
                         Spacer(),
                         GestureDetector(
                           onTap: () {
-                            Get.to(()=>const RatingReviewScreen());
-                            
+                            Get.to(() => const RatingReviewScreen());
                           },
                           child: Text('AllDetails',
                               style: GoogleFonts.poppins(
@@ -445,12 +450,16 @@ class ProductDetailsScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Expanded(flex: 1, child: _buildIndicatorAndText("Quality")),
                         Expanded(
-                            flex: 1, child: _buildIndicatorAndText("Strong space")),
-                        Expanded(flex: 1, child: _buildIndicatorAndText("Design ")),
+                            flex: 1, child: _buildIndicatorAndText("Quality")),
                         Expanded(
-                            flex: 1, child: _buildIndicatorAndText("Durability")),
+                            flex: 1,
+                            child: _buildIndicatorAndText("Strong space")),
+                        Expanded(
+                            flex: 1, child: _buildIndicatorAndText("Design ")),
+                        Expanded(
+                            flex: 1,
+                            child: _buildIndicatorAndText("Durability")),
                       ],
                     ),
                     sizedBoxHeight20,
@@ -488,71 +497,72 @@ class ProductDetailsScreen extends StatelessWidget {
                     sizedBoxHeight30,
                     SizedBox(
                       child: ListView.builder(
-                         shrinkWrap: true,
-                         physics: NeverScrollableScrollPhysics(),
-                        itemCount:3,
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: 3,
                         itemBuilder: (context, index) {
-                        return Column(
-                      children: [
-                        Row(
-                          children: [
-                            Text('Priya',
+                          return Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Text('Priya',
+                                      style: GoogleFonts.poppins(
+                                        // decoration: TextDecoration.lineThrough,
+                                        // decorationColor: Colors.grey,
+                                        color: black,
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 14.px,
+                                      )),
+                                  Spacer(),
+                                  Text('18-03-2024|10:00 AM',
+                                      style: GoogleFonts.poppins(
+                                        // decoration: TextDecoration.underline,
+                                        // decorationColor: buttonColor,
+                                        color: grey,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 12.px,
+                                      ))
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  VxRating(
+                                    size: Adaptive.h(2),
+                                    count: 5,
+                                    selectionColor: buttonColor,
+                                    onRatingUpdate: (value) {},
+                                  ),
+                                  Spacer(),
+                                  Text('18-03-2024|10:00 AM',
+                                      style: GoogleFonts.poppins(
+                                        // decoration: TextDecoration.underline,
+                                        // decorationColor: buttonColor,
+                                        color: grey,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 12.px,
+                                      ))
+                                ],
+                              ),
+                              Text(
+                                "is simply dummy text of the printing and type setting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,",
                                 style: GoogleFonts.poppins(
-                                  // decoration: TextDecoration.lineThrough,
-                                  // decorationColor: Colors.grey,
-                                  color: black,
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 14.px,
-                                )),
-                            Spacer(),
-                            Text('18-03-2024|10:00 AM',
-                                style: GoogleFonts.poppins(
-                                  // decoration: TextDecoration.underline,
-                                  // decorationColor: buttonColor,
-                                  color: grey,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 12.px,
-                                ))
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            VxRating(
-                              size: Adaptive.h(2),
-                              count: 5,
-                              selectionColor: buttonColor,
-                              onRatingUpdate: (value) {},
-                            ),
-                            Spacer(),
-                            Text('18-03-2024|10:00 AM',
-                                style: GoogleFonts.poppins(
-                                  // decoration: TextDecoration.underline,
-                                  // decorationColor: buttonColor,
-                                  color: grey,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 12.px,
-                                ))
-                          ],
-                        ),
-                        Text(
-                          "is simply dummy text of the printing and type setting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,",
-                          style: GoogleFonts.poppins(
-                              fontSize: 13.px, fontWeight: FontWeight.w500),
-                        ),
-                        sizedBoxHeight20
-                      ],
-                    );
-                      },),
+                                    fontSize: 13.px,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                              sizedBoxHeight20
+                            ],
+                          );
+                        },
+                      ),
                     )
-                    
                   ],
                 ),
               ),
             ),
             Positioned(
-              bottom: Adaptive.h(10),
-              right: Adaptive.w(3),
-              child: Image.asset('assets/images/detailsstack.png'))
+                bottom: Adaptive.h(10),
+                right: Adaptive.w(3),
+                child: Image.asset('assets/images/detailsstack.png'))
           ],
         ),
       ),
@@ -580,7 +590,7 @@ class ProductDetailsScreen extends StatelessWidget {
               ),
             ),
           ).onTap(() {
-            Get.to(()=>const CartScreen());
+            cartController.addToCart(productId);
           }),
           Container(
             height: Adaptive.h(6),
